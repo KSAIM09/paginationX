@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
-
 const Pagination = ({ currentPage, itemsPerPage, totalItems, paginate }) => {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-  const goToPage = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      paginate(page);
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      paginate(currentPage + 1);
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      paginate(currentPage - 1);
     }
   };
 
@@ -15,15 +20,16 @@ const Pagination = ({ currentPage, itemsPerPage, totalItems, paginate }) => {
     <nav>
       <div className="pagination">
         <div className="page-item">
-          <button onClick={() => goToPage(currentPage - 1)} className="page-link">
+          <button onClick={goToPreviousPage} className="page-link">
             Previous
           </button>
         </div>
+        {/* Optional: Display Current Page (You can also show total pages if needed) */}
         <div className="page-item">
           <div className="page-link">{currentPage}</div>
         </div>
         <div className="page-item">
-          <button onClick={() => goToPage(currentPage + 1)} className="page-link">
+          <button onClick={goToNextPage} className="page-link">
             Next
           </button>
         </div>
@@ -31,49 +37,55 @@ const Pagination = ({ currentPage, itemsPerPage, totalItems, paginate }) => {
     </nav>
   );
 };
-
-const DataTable = ({ currentItems }) => (
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Role</th>
-      </tr>
-    </thead>
-    <tbody>
-      {currentItems.map((item) => (
-        <tr key={item.id}>
-          <td>{item.id}</td>
-          <td>{item.name}</td>
-          <td>{item.email}</td>
-          <td>{item.role}</td>
+const DataTable = ({ currentItems }) => {
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
         </tr>
-      ))}
-    </tbody>
-  </table>
-);
+      </thead>
+      <tbody>
+        {currentItems.map((item) => (
+          <tr key={item.id}>
+            <td>{item.id}</td>
+            <td>{item.name}</td>
+            <td>{item.email}</td>
+            <td>{item.role}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+};
 
 const App = () => {
   const [items, setItems] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [itemsPerPage] = useState(10);
 
   useEffect(() => {
-    axios.get('https://geektrust.s3-ap-southeast-1.amazonaws.com/adminui-problem/members.json')
-        .then(response => {
-            setItems(response.data);
-        })
-        .catch(error => {
-            alert("Failed to fetch data", error)
-        });
-}, []);
+    axios
+      .get(
+        "https://geektrust.s3-ap-southeast-1.amazonaws.com/adminui-problem/members.json"
+      )
+      .then((response) => {
+        setItems(response.data);
+      })
+      .catch((error) => {
+        alert("Failed to fetch data");
+      });
+  }, []);
 
+  // Get current items
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = items.slice(indexOfFirstItem, indexOfLastItem);
 
+  // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
