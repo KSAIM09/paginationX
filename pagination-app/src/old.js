@@ -59,20 +59,16 @@ const App = () => {
   const [items, setItems] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get('https://geektrust.s3-ap-southeast-1.amazonaws.com/adminui-problem/members.json');
-        setItems(response.data);
-      } catch (error) {
-        setError('Failed to fetch data');
-      }
-    };
-
-    fetchData();
-  }, []);
+    axios.get('https://geektrust.s3-ap-southeast-1.amazonaws.com/adminui-problem/members.json')
+        .then(response => {
+            setItems(response.data);
+        })
+        .catch(error => {
+            alert("Failed to fetch data")
+        });
+}, []);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -83,19 +79,13 @@ const App = () => {
   return (
     <div>
       <h1>Employee Data Table</h1>
-      {error ? (
-        <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>
-      ) : (
-        <>
-          <DataTable currentItems={currentItems} />
-          <Pagination
-            currentPage={currentPage}
-            itemsPerPage={itemsPerPage}
-            totalItems={items.length}
-            paginate={paginate}
-          />
-        </>
-      )}
+      <DataTable currentItems={currentItems} />
+      <Pagination
+        currentPage={currentPage}
+        itemsPerPage={itemsPerPage}
+        totalItems={items.length}
+        paginate={paginate}
+      />
     </div>
   );
 };
