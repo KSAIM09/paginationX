@@ -61,11 +61,14 @@ const App = () => {
   const itemsPerPage = 10;
 
   useEffect(() => {
-    axios
-      .get("https://geektrust.s3-ap-southeast-1.amazonaws.com/adminui-problem/members.json")
-      .then((response) => setItems(response.data))
-      .catch(() => alert("Failed to fetch data"));
-  }, []);
+    axios.get('https://geektrust.s3-ap-southeast-1.amazonaws.com/adminui-problem/members.json')
+        .then(response => {
+            setItems(response.data);
+        })
+        .catch(error => {
+            alert("Failed to fetch data")
+        });
+}, []);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
